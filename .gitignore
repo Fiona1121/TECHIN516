@@ -13,3 +13,41 @@ kinova_ws/build/
 TECHIN516Lab0/
 /lab0/lab0_linux/
 .vscode/
+
+# Common ROS 2 build and install directories
+**/build/
+**/install/
+**/log/
+
+# Python-related files (global)
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.egg-info/
+
+# Colcon metadata
+**/.colcon/
+**/.colcon_cache/
+
+# Bag files (global)
+**/*.db3
+**/rosbag2_*
+
+# Debug and IDE configuration files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary and system files
+*.bak
+*.tmp
+*.log
+*.cache
+*.DS_Store
+Thumbs.db
+*.~*
+
+# Vendor and dependencies (optional, if shared across projects)
+**/node_modules/
+**/vendor/
