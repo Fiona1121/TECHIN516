@@ -45,6 +45,9 @@ rosdep update --rosdistro=$ROS_DISTRO
 
 # # install kinova packages
 git clone https://github.com/Kinovarobotics/ros2_kortex.git src/ros2_kortex
+cd src/ros2_kortex
+git checkout 97a0e7c
+cd ../..
 vcs import src --skip-existing --input src/ros2_kortex/ros2_kortex.$ROS_DISTRO.repos
 vcs import src --skip-existing --input src/ros2_kortex/ros2_kortex-not-released.$ROS_DISTRO.repos
 vcs import src --skip-existing --input src/ros2_kortex/simulation.humble.repos
@@ -63,5 +66,4 @@ cd ..
 # build
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --parallel-workers 3
-rm ros_controls.humble.repos
 source install/setup.bash
