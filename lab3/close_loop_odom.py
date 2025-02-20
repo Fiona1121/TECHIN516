@@ -11,9 +11,16 @@ class OdomCloseLoop(Node):
         super().__init__('close_loop_odom')
         # debug mode
         self.debug = True
-        self.sub = # TODO: subscribe to /odom topic
+        self.sub = self.sub = self.create_subscription(
+            Odometry,
+            '/odom',
+            self.odom_callback,
+            10
+        )
+
         # Publisher to control the velocity
-        self.pub = # TODO: add the publisher to send velocity values
+        self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        
         self.position_x_list = []
         self.motion_move = Twist()
         self.motion_stop = Twist()
@@ -29,7 +36,7 @@ class OdomCloseLoop(Node):
         if len(self.position_x_list) > 2:
             # Check if the last recorded position is greater than the first one
             # plus the desired distance to travel
-            if # TODO: fill in the condition to check whether the last item on the list
+            if self.position_x_list[-1] > self.position_x_list[0] + 1.5:
             # is greater than the first one plus the desired distance to be traveled
                 self.pub.publish(self.motion_stop)
                 self.get_logger().info("Reached goal, stopping...")

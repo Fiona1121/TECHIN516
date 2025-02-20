@@ -11,9 +11,16 @@ class LaserCloseLoop(Node):
         super().__init__('laser_closeloop')
         self.debug = True
         # Subscriber to the laser scan topic
-        self.sub # TODO: create the subscriber to read laser data
+        self.sub = self.create_subscription(
+            LaserScan,
+            '/scan',
+            self.scan_callback,
+            10
+        )
+
         # Publisher for velocity commands
-        self.pub = # TODO: create the publisher to send velocity values
+        self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
+
         self.front_value_list = []
         self.motion_move = Twist()
         self.motion_stop = Twist()
@@ -29,7 +36,7 @@ class LaserCloseLoop(Node):
 
         if len(self.front_value_list) > 2:
             # Adjust condition based on desired stopping distance
-            if # TODO: Fill out the if condition to check whether the last item on the list
+            if self.front_value_list[-1] < self.front_value_list[0] - 1.5:
             # is smaller than the substraction between the first one and the desired distance to be traveled
                 self.pub.publish(self.motion_stop)
                 self.get_logger().info("Reached goal, stopping...")
