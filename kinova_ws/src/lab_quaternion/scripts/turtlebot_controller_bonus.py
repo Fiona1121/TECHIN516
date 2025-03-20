@@ -35,13 +35,19 @@ def main():
     rclpy.init()
     turtlebot_node = TurtleBotController()
     movements = [
-        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 16.40},
-        # Add more movements if needed
+        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.0},
+        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 5.5},
+        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 3.0},
+        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 8.0},
+        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.3},
+        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 6.3},
+        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 0.8},
     ]
     turtlebot_node.move_sequence(movements)
     time.sleep(2.5*60)
     movements_reverse = [
-        {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 16.30},
+       {"linear_vel": -move["linear_vel"], "angular_vel": -move["angular_vel"], "duration": move["duration"]}
+        for move in reversed(movements)
     ]
     turtlebot_node.move_sequence(movements_reverse)
     turtlebot_node.destroy_node()

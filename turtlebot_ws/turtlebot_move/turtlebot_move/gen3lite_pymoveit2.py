@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-import rclpy
-from rclpy.node import Node
-import time
+
+# based on ex_pose_goal.py and ex_gripper.py from pymoveit2 package
+# https://github.com/AndrejOrsula/pymoveit2/blob/master/examples/ex_pose_goal.py
+# https://github.com/AndrejOrsula/pymoveit2/blob/master/examples/ex_gripper.py
+
 from threading import Thread
+import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
 import rclpy.exceptions
 import rclpy.executors
+from rclpy.node import Node
 from pymoveit2 import GripperInterface, MoveIt2, MoveIt2State
 from geometry_msgs.msg import Pose, Point, Quaternion
 from sensor_msgs.msg import JointState
+import time
+
 
 class Gen3LiteGripper():
     def __init__(self):
@@ -183,95 +189,25 @@ class Gen3LiteArm():
         self.executor_thread.join()
         exit(0)
 
-class KinovaArmController(Node):
-    def __init__(self):
-        super().__init__('kinova_arm_controller')
-        self.arm = Gen3LiteArm()
-        self.gripper = Gen3LiteGripper()
-        self.get_logger().info("✅ Kinova Arm Controller Node Initialized.")
-
-    def set_pose(self, x, y, z, qx, qy, qz, qw):
-        pose = Pose()
-        pose.position.x = x
-        pose.position.y = y
-        pose.position.z = z
-        pose.orientation.x = qx
-        pose.orientation.y = qy
-        pose.orientation.z = qz
-        pose.orientation.w = qw
-        return pose
-
-    def execute_pick_and_place(self):
-        self.get_logger().info("🚀 Starting pick-and-place sequence...")
-        
-        self.get_logger().info("🔄 Moving arm to vertical home position...")
-        self.arm.go_vertical()
-        time.sleep(1.0)
-
-        # Define poses
-        pre_pick_pose = self.set_pose(0.370, -0.052, 0.371, 0.817, 0.574, -0.036, 0.028)
-        pick_pose = self.set_pose(0.370, -0.040, 0.130, 0.758, 0.652, 0.008, 0.017)
-        pre_put_pose1 = self.set_pose(-0.293, 0.081, 0.228, 0.752, 0.658, 0.023, -0.027)
-        pre_put_pose2 = self.set_pose(-0.174, -0.002, 0.191, 0.494, 0.867, -0.007, -0.066)
-        put_pose1 = self.set_pose(-0.195, 0.034, -0.164, 0.494, 0.867, -0.008, -0.066)
-        put_pose2 = self.set_pose(-0.173, 0.03, -0.342, 0.542, 0.838, -0.04, -0.042)
-
-        self.get_logger().info("🤖 Moving to pre-pick position...")
-        self.arm.inverse_kinematic_movement(pre_pick_pose)
-        time.sleep(0.5)
-
-        self.get_logger().info("🛠 Closing gripper before pick...")
-        self.gripper.move_to_position(0.0)
-
-        self.get_logger().info("🤖 Moving to pick position...")
-        self.arm.inverse_kinematic_movement(pick_pose)
-
-        self.get_logger().info("🛠 Opening gripper to grasp object...")
-        self.gripper.move_to_position(0.8)
-        self.get_logger().info("✅ Object picked up!")
-
-        self.get_logger().info("📦 Moving to pre-put position 1...")
-        self.arm.inverse_kinematic_movement(pre_put_pose1)
-        time.sleep(0.5)
-
-        self.get_logger().info("📦 Moving to pre-put position 2...")
-        self.arm.inverse_kinematic_movement(pre_put_pose2)
-        time.sleep(0.5)
-
-        self.get_logger().info("📦 Moving to put-down position 1...")
-        self.arm.inverse_kinematic_movement(put_pose1)
-        time.sleep(0.5)
-
-        self.get_logger().info("📦 Moving to final put-down position...")
-        self.arm.inverse_kinematic_movement(put_pose2)
-        time.sleep(0.5)
-
-        self.get_logger().info("🛠 Releasing object (closing gripper)...")
-        self.gripper.move_to_position(0.0)
-        self.get_logger().info("✅ Object placed successfully!")
-
-        self.get_logger().info("🔄 Returning to vertical home position...")
-        self.arm.go_vertical()
-        time.sleep(1.0)
-
-        self.get_logger().info("✅ Pick-and-place sequence completed!")
-
-    def shutdown(self):
-        self.get_logger().info("🛑 Shutting down gripper and arm...")
-        self.gripper.shutdown()
-        self.arm.shutdown()
-        self.get_logger().info("✅ Kinova Arm Controller shut down cleanly.")
-
 
 def main():
     rclpy.init()
-    kinova_node = KinovaArmController()
-    kinova_node.get_logger().info("✨ Ready to execute pick-and-place sequence.")
-    kinova_node.execute_pick_and_place()
-    kinova_node.shutdown()
-    kinova_node.destroy_node()
+    arm = Gen3LiteArm()
+    gripper = Gen3LiteGripper()
+    pose = Pose()
+    pose.position = Point(x=0.077, y=0.094, z=0.799)
+    pose.orientation = Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)
+    print(arm.get_end_effector_pose())
+    arm.inverse_kinematic_movement(pose)
+    print(arm.get_end_effector_pose())
+    arm.go_home()
+    arm.go_vertical()
+    gripper.open()
+    gripper.move_to_position(0.5)
+    gripper.close()
     rclpy.shutdown()
-    print("\n✅ Kinova pick-and-place script finished execution.")
+    gripper.shutdown()
+    arm.shutdown()
 
 
 if __name__ == '__main__':

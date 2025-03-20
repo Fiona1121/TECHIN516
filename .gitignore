@@ -51,3 +51,5 @@ Thumbs.db
 # Vendor and dependencies (optional, if shared across projects)
 **/node_modules/
 **/vendor/
+
+turtlebot_ws/techin516_final/
