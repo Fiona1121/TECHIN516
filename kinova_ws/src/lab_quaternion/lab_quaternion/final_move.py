@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import rclpy
 import time
 from rclpy.node import Node
@@ -122,16 +123,19 @@ class PickAndPlaceSequence:
     def execute_sequence(self):
         """Executes the full pick-and-place sequence."""
         positions = [
-            (0.380, -0.012, 0.4, 1.000, 0.002, 0.011, -0.012, "Pre-Pick Position"),
-            (0.380, -0.012, 0.124, 1.000, 0.002, 0.011, -0.012, "Pick Position"),
+            ("close",), 
+            (0.380, -0.012, 0.39, 1.000, 0.002, 0.011, -0.012, "Pre-Pick Position"),
+            (0.380, -0.014, 0.120, 1.000, 0.002, 0.011, -0.012, "Pick Position"),
             ("open",),  # Open gripper
-            (0.380, -0.012, 0.23, 1.000, 0.002, 0.011, -0.012, "Lift Position"),
-            (-0.314, 0.047, 0.163, -0.542, 0.832, 0.071, -0.095, "Pre-Put Position 1"),
+            (0.380, -0.012, 0.39, 1.000, 0.002, 0.011, -0.012, "Lift Position"),
+            # (-0.314, 0.047, 0.163, -0.542, 0.832, 0.071, -0.095, "Pre-Put Position 1"),
             (-0.314, 0.041, -0.036, -0.548, 0.835, -0.006, -0.044, "Pre-Put Position 2"),
             (-0.267, -0.007, -0.232, -0.552, 0.829, -0.084, 0.007, "Put Position 1"),
             (-0.257, -0.019, -0.315, -0.553, 0.829, -0.085, 0.008, "Put Position 2"),
             ("close",),  # Close gripper
         ]
+
+        self.arm.go_vertical()
 
         for action in positions:
             if isinstance(action, tuple):
@@ -159,32 +163,58 @@ def main():
     """Executes the full movement sequence and pick-and-place task."""
     rclpy.init()
 
-    # 🔄 Movement before pick-and-place
-    movements_before = [
-        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 1.0},
-        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 5.5},
-        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 2.7},
-        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 8.0},
-        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.4},
-        {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 6.0},
-        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 1.2},
-    ]
+    # 🛠 Set new value
+    # new_server = "10.19.159.77:11811"
+    # os.environ["ROS_DISCOVERY_SERVER"] = new_server
+    # time.sleep(3)
 
-    execute_movement_sequence(movements_before)
+    # # 🔄 Movement before pick-and-place
+    # movements_before = [
+    #     {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 1.0},
+    #     {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 5.5},
+    #     {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 2.7},
+    #     {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 8.0},
+    #     {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.3},
+    #     {"linear_vel": 0.2, "angular_vel": 0.0, "duration": 6.3},
+    #     {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 0.8},
+    # ]
+
+    # execute_movement_sequence(movements_before)
+
+
+
+
+    # 🔍 Print current value before unsetting
+    # print(f"🔍 Before unsetting: {os.environ.get('ROS_DISCOVERY_SERVER')}")
+
+    # ❌ Unset the variable
+    # os.system("unset ROS_DISCOVERY_SERVER")
+    # time.sleep(3)
+
+    # 🔍 Print after unsetting
+    # print(f"🔍 After unsetting: {os.environ.get('ROS_DISCOVERY_SERVER')}")
 
     # 🛠 Execute Pick-and-Place Sequence
     pick_and_place = PickAndPlaceSequence()
     pick_and_place.execute_sequence()
 
+    
+
+    # 🛠 Set new value
+    # os.environ["ROS_DISCOVERY_SERVER"] = new_server
+    # time.sleep(3)
+
+    # print(f"🔍 After setting: {os.environ.get('ROS_DISCOVERY_SERVER')}")
+
     # 🔄 Movement after pick-and-place
     movements_after = [
-        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 1.0},
-        {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 6.0},
-        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 2.35},
-        {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 7.5},
-        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.5},
+        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 0.8},
+        {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 6.3},
+        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 2.3},
+        {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 8.0},
+        {"linear_vel": 0.0, "angular_vel": -0.5, "duration": 2.7},
         {"linear_vel": -0.2, "angular_vel": 0.0, "duration": 5.5},
-        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 1.1},
+        {"linear_vel": 0.0, "angular_vel": 0.5, "duration": 1.0},
     ]
 
     execute_movement_sequence(movements_after)
